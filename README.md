@@ -23,10 +23,7 @@ import { OMLProvider } from "@oneminutelogs/browser/next";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <OMLProvider
-      routeTemplates={["/", "/jobs/[id]"]}
-      endpointTemplates={["/api/jobs/[id]"]}
-    >
+    <OMLProvider>
       {children}
     </OMLProvider>
   );
@@ -58,22 +55,21 @@ export function POST(request: Request) {
     apiKey: process.env.ONE_MINUTE_LOGS_API_KEY,
     projectName: "my-app",
     environment: process.env.NODE_ENV || "development",
-    routeTemplates: ["/", "/jobs/[id]"],
-    endpointTemplates: ["/api/jobs/[id]"],
   });
 }
 ```
 
-Keep `ONE_MINUTE_LOGS_API_KEY` server-only; never prefix it with `NEXT_PUBLIC_`. Use the same project name as your backend logger and matching templates in the provider and server handler. Templates should contain placeholders, not personal identifiers.
+Keep `ONE_MINUTE_LOGS_API_KEY` server-only; never prefix it with `NEXT_PUBLIC_`. Use the same project name as your backend logger.
 
-If you already use the `@oneminutelogs/next` catch-all forwarder, enable its `browser` option instead of adding a separate endpoint.
+If you already use `@oneminutelogs/next`, its `forwardRequest({ logger })`
+catch-all handler enables browser forwarding automatically.
 
 ## Options
 
 | Provider option | Purpose |
 | --- | --- |
-| `routeTemplates` | Safe page patterns, such as `/jobs/[id]`. Unmatched pages use `unknown_route`. |
-| `endpointTemplates` | Safe same-origin API patterns. Unmatched requests use `unknown_endpoint`. |
+| `routeTemplates` | Optional patterns such as `/jobs/[id]` for grouping dynamic page URLs. |
+| `endpointTemplates` | Optional patterns such as `/api/jobs/[id]` for grouping dynamic API URLs. |
 | `slowRequestThresholdMs` | Slow-request threshold; defaults to `5000` ms. |
 | `significantQueryParams` | Query parameters that indicate navigation. Values are compared locally, not transmitted. |
 

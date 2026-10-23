@@ -29,6 +29,9 @@ export function normalizeNavigation(input, options = {}) {
     const templates = options.routeTemplates ?? [];
     const framework = input.frameworkTemplate;
     const route = pathname && framework && safeTemplate(framework) && match(framework, pathname) ? framework
-        : templates.find(template => pathname && safeTemplate(template) && match(template, pathname)) ?? "unknown_route";
+        : templates.find(template => pathname && safeTemplate(template) && match(template, pathname))
+            // Static, privacy-safe paths work without configuration. Templates remain
+            // useful when an application wants to collapse dynamic path segments.
+            ?? (templates.length === 0 && safeTemplate(pathname) ? pathname : "unknown_route");
     return { key, route };
 }
