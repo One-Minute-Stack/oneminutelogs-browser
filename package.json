@@ -1,0 +1,75 @@
+{
+  "name": "@oneminutelogs/browser",
+  "version": "1.0.0",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.ts",
+      "import": "./dist/react/index.js"
+    },
+    "./next": {
+      "types": "./dist/next/index.d.ts",
+      "import": "./dist/next/index.js"
+    },
+    "./debug": {
+      "types": "./dist/debug/index.d.ts",
+      "import": "./dist/debug/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js",
+      "require": "./dist/server/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.json",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js",
+    "test:browser": "npm run build && node test/run-browser.mjs",
+    "test:react-browser": "npm run test:next-browser",
+    "test:next-browser": "node test/run-browser.mjs next && node test/run-next-health.mjs",
+    "test:transport-browser": "npm run build && node test/run-browser.mjs transport",
+    "test:health-browser": "npm run build && node test/run-idle-tabs.mjs",
+    "test:errors-browser": "npm run build && node test/run-browser.mjs errors",
+    "test:errors-next-browser": "node test/run-errors-next.mjs",
+    "test:network-browser": "npm run build && node test/run-browser.mjs network",
+    "test:network-next-browser": "node test/run-network-next.mjs"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "next": ">=14"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "next": "16.4.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "vite": "^7.0.0",
+    "@types/node": "^20.19.43",
+    "typescript": "^6.0.3"
+  },
+  "typesVersions": {
+    "*": {
+      "server": [
+        "dist/server/index.d.ts"
+      ]
+    }
+  }
+}
