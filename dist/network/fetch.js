@@ -7,8 +7,43 @@ const own = (object, key) => {
     const d = Object.getOwnPropertyDescriptor(object, key);
     return d && Object.hasOwn(d, "value") ? d.value : undefined;
 };
+const header = (input, init, name) => {
+    try {
+        const configured = own(init, "headers");
+        if (configured && typeof Headers !== "undefined") {
+            try {
+                const value = Headers.prototype.get.call(configured, name);
+                if (value !== null)
+                    return value;
+            }
+            catch {
+                for (const key of [name, name.toLowerCase(), name.toUpperCase()]) {
+                    const value = own(configured, key);
+                    if (typeof value === "string")
+                        return value;
+                }
+            }
+        }
+    }
+    catch { }
+    if (typeof Request !== "undefined" && typeof Headers !== "undefined")
+        try {
+            const headers = Object.getOwnPropertyDescriptor(Request.prototype, "headers")?.get?.call(input);
+            return Headers.prototype.get.call(headers, name);
+        }
+        catch { }
+    return null;
+};
 /** Capture only safe metadata; custom URL coercion and request headers/bodies are never read. */
 export function requestMetadata(input, init, observer) {
+    // Next.js and browsers may prefetch links as they enter the viewport. Those
+    // speculative requests are not user-observed application traffic.
+    if (header(input, init, "purpose")?.toLowerCase() === "prefetch" ||
+        header(input, init, "sec-purpose")?.toLowerCase().includes("prefetch") ||
+        header(input, init, "next-router-prefetch") !== null ||
+        header(input, init, "next-router-segment-prefetch") !== null ||
+        header(input, init, "x-middleware-prefetch") !== null)
+        return undefined;
     let raw = input, requestMethod;
     if (typeof input !== "string") {
         raw = undefined;
